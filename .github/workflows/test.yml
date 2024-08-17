@@ -10,21 +10,16 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-    
-      - name: Get Package.Json
-        id: json_properties
-        uses: ActionsTools/read-json-action@main
-        with:
-          file_path: "package.json"
           
       - name: Setup NodeJS
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ steps.json_properties.outputs.engines.node }}
+          node-version: 20.9.0
           
       - name: Build App
         run: |
-          npm ci
+          npm install
+          npm install @actions/core
           npm run test:coverage
           
       - name: Read Jest-Summary
