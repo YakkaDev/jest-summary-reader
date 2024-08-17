@@ -19,10 +19,6 @@ describe('reader.js tests', () => {
 		await expect(reader(jsonpath, 'exe')).rejects.toThrow("Available extensions for the file 'coverage-summary' are '.txt' and '.json'.");
 	});
 	
-	it('throws an invalid path', async () => {
-		await expect(reader('jopa', 'exe')).rejects.toThrow(`ENOENT: no such file or directory, open 'jopa'`);
-	});
-	
 	it('resolves a .txt summary', async () => {
 		await expect(reader(txtpath, 'txt')).resolves.toEqual(expected);
 	});

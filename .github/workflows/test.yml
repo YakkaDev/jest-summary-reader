@@ -24,7 +24,7 @@ jobs:
           
       - name: Build App
         run: |
-          npm install
+          npm ci
           npm run test:coverage
           
       - name: Read Jest-Summary
