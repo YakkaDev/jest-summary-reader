@@ -20,7 +20,7 @@ describe('reader.js tests', () => {
 	});
 	
 	it('throws an invalid path', async () => {
-		await expect(reader('jopa', 'exe')).rejects.toThrow(`ENOENT: no such file or directory, open '${path.join(__dirname, '..', 'jopa')}'`);
+		await expect(reader('jopa', 'exe')).rejects.toThrow(`ENOENT: no such file or directory, open 'jopa'`);
 	});
 	
 	it('resolves a .txt summary', async () => {
