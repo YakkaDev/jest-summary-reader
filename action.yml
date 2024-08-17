@@ -1,0 +1,41 @@
+name: 'Jest Summary Reader'
+description: 'Parser for coverage-summary file.'
+author: 'YakkaDev'
+
+branding:
+  icon: 'book-open'
+  color: 'purple'
+
+
+inputs:
+  format:
+    description: 'Extension of your coverage-summary file.'
+    required: false
+    default: 'json'
+    
+  path:
+    description: 'Path to your coverage-summary file.'
+    required: true
+    default: 'coverage-summary.json'
+
+
+outputs:
+  average:
+    description: 'Average percentage among all categories.'
+    
+  functions:
+    description: 'The percentage value among all covered functions.'
+    
+  lines:
+    description: 'The percentage value among all covered rows.'
+    
+  statements:
+    description: 'The percentage value among all covered statements.'
+    
+  branches:
+    description: 'The percentage value among all covered branches.'
+  
+
+runs:
+  using: node19
+  main: src/index.js

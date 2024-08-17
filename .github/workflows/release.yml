@@ -1,0 +1,54 @@
+name: Publish release to GitHub
+
+on:
+  workflow_dispatch: ~
+      
+jobs:
+  build:
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@master
+    
+      - name: Get Package.Json
+        id: json_properties
+        uses: ActionsTools/read-json-action@main
+        with:
+          file_path: "package.json"
+          
+      - name: Read Changelog.MD
+        id: read_changelog
+        uses: andstor/file-reader-action@v1
+        with:
+          path: "CHANGELOG.md"
+          
+      - name: Build release
+        run: |
+          mkdir ./build
+          zip -r ./build/Source-${{ steps.json_properties.outputs.version }}.zip . -x node_modules/\* -x .git/\* -x .github/\* -x build/\* -x \*.zip -x \*.tgz -x package-lock.json -x coverage-summary.json
+      
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.ALL_TOKEN }}
+        with:
+          tag_name: v${{ steps.json_properties.outputs.version }}
+          release_name: Release v${{ steps.json_properties.outputs.version }}
+          body: ${{ steps.read_changelog.outputs.contents }}
+          draft: false
+          prerelease: false
+          
+      - name: Upload Release Asset
+        id: upload-release-asset 
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.ALL_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./build/Source-${{ steps.json_properties.outputs.version }}.zip
+          asset_name: Source-${{ steps.json_properties.outputs.version }}.zip
+          asset_content_type: application/zip
+
+      - run: rm -rf ./build

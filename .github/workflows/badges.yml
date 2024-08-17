@@ -1,0 +1,104 @@
+name: Create git badges
+
+on:
+  workflow_dispatch: ~
+  release:
+    types: [published]
+
+
+env:
+  GIST_TOKEN: ${{ secrets.GIST_SECRET }}
+  GIST_ID: 25a7339dde450b2a63576f0ec7575448
+
+jobs:
+  git-badges:
+    name: Git Badges
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo with all history
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      
+      - name: Output git info
+        id: git_info
+        run: |
+          function format_size { echo $(numfmt --to iec --suffix B $1); }
+          function format_number { LC_ALL=en_US.UTF-8 printf "%'d\n" $1; }
+          echo "file_count=$(format_number $(git ls-files | wc -l))" >> $GITHUB_OUTPUT
+          echo "last_commit_date=$(git log -1 --format=%cd)" >> $GITHUB_OUTPUT
+          echo "latest_release=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
+          echo "commits_to_main=$(format_number $(git rev-list --count main))" >> $GITHUB_OUTPUT
+          git gc
+          echo "size=$(format_size $(($(git count-objects -v | grep 'size-pack: ' | sed 's/size-pack: //g' | tr -d '\n') * 1024)))" >> $GITHUB_OUTPUT
+          echo "NODE_VERSION=$(cat package.json | grep \"node\" | cut -d'"' -f 4)" >> $GITHUB_OUTPUT
+          echo "NPM_VERSION=$(cat package.json | grep \"npm\" | cut -d'"' -f 4)" >> $GITHUB_OUTPUT
+        shell: bash
+        
+      - name: Setup NodeJS
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ steps.git_info.outputs.NODE_VERSION }}
+          
+      - name: Jest Coverage
+        id: jest_coverage
+        run: |
+          npm install
+          npm run test:coverage
+          echo "FUNCTIONS_COVERAGE=$(jq .total.functions.pct __tests__/coverage-summary.json)%" >> $GITHUB_OUTPUT
+          rm -rf ./__tests__/coverage-summary.json
+
+      - name: Create git-size badge
+        uses: schneegans/dynamic-badges-action@v1.7.0
+        with:
+          auth: ${{ env.GIST_TOKEN }}
+          gistID: ${{ env.GIST_ID }}
+          filename: git-size.json
+          label: size
+          message: ${{ steps.git_info.outputs.size }}
+          namedLogo: git
+          color: f1502f
+
+      - name: Create git-file-count badge
+        uses: schneegans/dynamic-badges-action@v1.7.0
+        with:
+          auth: ${{ env.GIST_TOKEN }}
+          gistID: ${{ env.GIST_ID }}
+          filename: git-file-count.json
+          label: files
+          message: ${{ steps.git_info.outputs.file_count }}
+          namedLogo: git
+          color: f1502f
+
+      - name: Create git-last-commit badge
+        uses: schneegans/dynamic-badges-action@v1.7.0
+        with:
+          auth: ${{ env.GIST_TOKEN }}
+          gistID: ${{ env.GIST_ID }}
+          filename: git-last-commit-date.json
+          label: last commit
+          message: ${{ steps.git_info.outputs.last_commit_date }}
+          namedLogo: git
+          color: f1502f
+    
+      - name: Create git-latest-release badge
+        uses: schneegans/dynamic-badges-action@v1.7.0
+        with:
+          auth: ${{ env.GIST_TOKEN }}
+          gistID: ${{ env.GIST_ID }}
+          filename: git-latest-release.json
+          label: latest release
+          message: ${{ steps.git_info.outputs.latest_release }}
+          namedLogo: git
+          color: f1502f
+
+      - name: Create jest-coverage badge
+        uses: schneegans/dynamic-badges-action@v1.7.0
+        with:
+          auth: ${{ env.GIST_TOKEN }}
+          gistID: ${{ env.GIST_ID }}
+          filename: jest-coverage.json
+          label: coverage
+          message: ${{ steps.jest_coverage.outputs.FUNCTIONS_COVERAGE }}
+          namedLogo: jest
+          color: f1502f

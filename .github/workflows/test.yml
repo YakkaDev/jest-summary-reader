@@ -1,0 +1,42 @@
+name: Some tests
+
+on:
+  workflow_dispatch: ~
+  
+jobs:
+  tests:
+    name: Run some tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+    
+      - name: Get Package.Json
+        id: json_properties
+        uses: ActionsTools/read-json-action@main
+        with:
+          file_path: "package.json"
+          
+      - name: Setup NodeJS
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ steps.json_properties.outputs.engines.node }}
+          
+      - name: Build App
+        run: |
+          npm install
+          npm run test:coverage
+          
+      - name: Read Jest-Summary
+        id: jest-summary
+        uses: YakkaDev/jest-summary-reader@v1.0.0
+        with:
+          path: ./__tests__/coverage-summary.json
+          
+      - run: |
+          echo Coverage Average - ${{ steps.jest-summary.outputs.average }}
+          echo Coverage Functions - ${{ steps.jest-summary.outputs.functions }}
+          echo Coverage Lines - ${{ steps.jest-summary.outputs.lines }}
+          echo Coverage Statements - ${{ steps.jest-summary.outputs.statements }}
+          echo Coverage Branches - ${{ steps.jest-summary.outputs.branches }}
+          rm -rf ./__tests__/coverage-summary.json

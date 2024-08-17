@@ -1,0 +1,40 @@
+{
+	"name": "jest-summary-reader",
+	"version": "1.0.0",
+	"description": "Jest-summary reader github action.",
+	"homepage": "https://github.com/YakkaDev/jest-summary-reader#readme",
+	"author": "Illia Korovin <admin@hostlike.pro> (https://github.com/YakkaDev/)",
+	"license": "MIT",
+	"type": "commonjs",
+	"main": "index.js",
+	"scripts": {
+		"test": "jest --forceExit",
+		"test:coverage": "jest --forceExit --coverage"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/YakkaDev/jest-summary-reader.git",
+		"directory": "."
+	},
+	"bugs": {
+		"url": "https://github.com/YakkaDev/jest-summary-reader/issues",
+		"email": "admin@hostlike.pro"
+	},
+	"engines": {
+		"node": "19.7.0",
+		"npm": "9.5.0"
+	},
+	"dependencies": {
+		"@actions/core": "1.10.1"
+	},
+	"devDependencies": {
+		"jest": "29.7.0"
+	},
+	"keywords": [
+		"jest",
+		"summary",
+		"reader",
+		"github",
+		"actions"
+	]
+}
