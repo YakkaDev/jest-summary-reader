@@ -81,3 +81,5 @@ This project is released under the [MIT License](https://github.com/YakkaDev/jes
 The application uses a [@actions/core](https://github.com/actions/toolkit) packages.
 
 ---
+
+<!-- Security scan triggered at 2025-09-02 03:19:01 -->
